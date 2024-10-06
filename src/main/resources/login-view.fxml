@@ -6,10 +6,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.ksilisk.infosec.LoginController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.ksilisk.infosec.controller.LoginController">
     <top>
         <MenuBar>
-            <Menu text="hello"/>
+            <Menu text="InfoSec"/>
         </MenuBar>
     </top>
     <center>
@@ -19,12 +19,12 @@
             </padding>
 
             <Label text="Login:"/>
-            <TextField fx:id="loginField" text="ADMIN"/>
+            <TextField fx:id="loginField"/>
             <Label text="Password:"/>
             <PasswordField fx:id="passwordField"/>
             <HBox alignment="CENTER" spacing="20">
-                <Button text="Login!"/>
-                <Button text="Exit"/>
+                <Button text="Login!" onMouseClicked="#login"/>
+                <Button text="Exit" onMouseClicked="#exit"/>
             </HBox>
         </VBox>
     </center>

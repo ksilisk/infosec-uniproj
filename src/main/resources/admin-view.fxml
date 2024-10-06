@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ksilisk.infosec.controller.AdminController"
+            prefHeight="400.0" prefWidth="600.0">
+    <top>
+        <MenuBar>
+            <Menu text="InfoSec"/>
+        </MenuBar>
+    </top>
+    <center>
+        <VBox>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+
+            <Label fx:id="adminHelloLabel"/>
+            <TableView>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+                <columns>
+                    <TableColumn fx:id="usernameColumn" sortable="false" text="Username"/>
+                    <TableColumn fx:id="passwordColumn" sortable="false" text="Password"/>
+                    <TableColumn fx:id="isBlockedColumn" sortable="false" text="Blocked"/>
+                    <TableColumn fx:id="passwordRestrictionColumn" sortable="false" text="Password Restriction"/>
+                    <TableColumn fx:id="isAdminColumn" sortable="false" text="Admin"/>
+                </columns>
+            </TableView>
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="addUserButton" onMouseClicked="#addUser" text="Add user"/>
+                <Button fx:id="changePasswordButton" onMouseClicked="#changePassword" text="Change Password"/>
+                <Button fx:id="exitButton" onMouseClicked="#exit" text="exit"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
