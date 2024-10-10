@@ -3,13 +3,15 @@ package com.ksilisk.infosec.database;
 import com.ksilisk.infosec.config.ApplicationProperties;
 import com.ksilisk.infosec.initialize.Initializable;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
-public enum DatabaseClient implements Initializable {
+public enum DatabaseClient implements Initializable, Closeable {
     INSTANCE;
 
     private final ApplicationProperties properties = ApplicationProperties.INSTANCE;
@@ -18,7 +20,11 @@ public enum DatabaseClient implements Initializable {
     private Path tmpFilePath;
 
     public void save(byte[] bytes) throws IOException {
-        Files.write(tmpFilePath, bytes);
+        Files.write(databasePath, bytes);
+    }
+
+    public void writeAheadLog(byte[] bytes) throws IOException {
+        Files.write(tmpFilePath, bytes, StandardOpenOption.APPEND);
     }
 
     public byte[] load() throws IOException {
@@ -39,5 +45,10 @@ public enum DatabaseClient implements Initializable {
     @Override
     public int getOrder() {
         return Integer.MIN_VALUE;
+    }
+
+    @Override
+    public void close() throws IOException {
+        Files.delete(tmpFilePath);
     }
 }

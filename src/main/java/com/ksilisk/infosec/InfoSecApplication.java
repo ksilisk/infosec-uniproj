@@ -1,16 +1,16 @@
 package com.ksilisk.infosec;
 
-import com.ksilisk.infosec.config.ApplicationProperties;
+import com.ksilisk.infosec.close.DefaultApplicationCloser;
+import com.ksilisk.infosec.factory.ApplicationStageFactory;
+import com.ksilisk.infosec.factory.DefaultApplicationStageFactory;
 import com.ksilisk.infosec.initialize.DefaultApplicationInitializer;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class InfoSecApplication extends Application {
-    private final ApplicationProperties applicationProperties = ApplicationProperties.INSTANCE;
+    private final ApplicationStageFactory applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
 
     @Override
     public void init() throws Exception {
@@ -19,16 +19,14 @@ public class InfoSecApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(applicationProperties.getLoginViewFile().toURI().toURL());
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("InfoSec App!");
-        stage.setScene(scene);
-        stage.show();
+        Stage loginStage = applicationStageFactory.createLoginStage();
+        loginStage.initOwner(stage);
+        loginStage.show();
     }
 
     @Override
     public void stop() throws Exception {
-
+        DefaultApplicationCloser.INSTANCE.close();
     }
 
     public static void main(String[] args) {

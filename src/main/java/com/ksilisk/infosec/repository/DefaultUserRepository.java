@@ -7,6 +7,7 @@ import com.ksilisk.infosec.database.DatabaseClient;
 import com.ksilisk.infosec.entity.User;
 import com.ksilisk.infosec.initialize.Initializable;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public enum DefaultUserRepository implements UserRepository, Initializable {
+public enum DefaultUserRepository implements UserRepository, Initializable, Closeable {
     INSTANCE;
 
     private final ApplicationProperties appProperties = ApplicationProperties.INSTANCE;
@@ -47,6 +48,12 @@ public enum DefaultUserRepository implements UserRepository, Initializable {
     @Override
     public void saveUser(User user) throws IOException {
         users.put(user.username(), user);
-        databaseClient.save(objectMapper.writeValueAsBytes(user));
+        databaseClient.writeAheadLog(objectMapper.writeValueAsBytes(user));
+    }
+
+    @Override
+    public void close() throws IOException {
+        List<User> userList = users.values().stream().toList();
+        databaseClient.save(objectMapper.writeValueAsBytes(userList));
     }
 }
