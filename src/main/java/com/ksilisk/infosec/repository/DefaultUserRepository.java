@@ -9,10 +9,7 @@ import com.ksilisk.infosec.initialize.Initializable;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,12 +27,12 @@ public enum DefaultUserRepository implements UserRepository, Initializable, Clos
         if (databaseData.length > 0) {
             List<User> userList = objectMapper.readValue(databaseClient.load(), new TypeReference<>() {
             });
-            this.users.putAll(userList.stream().collect(Collectors.toMap(User::username, Function.identity())));
+            this.users.putAll(userList.stream().collect(Collectors.toMap(User::getUsername, Function.identity())));
         }
 
         if (!users.containsKey(appProperties.getApplicationAdminUserLogin())) {
             User adminUser = new User(appProperties.getApplicationAdminUserLogin(),
-                    appProperties.getApplicationAdminUserPassword(), false, null, true);
+                    appProperties.getApplicationAdminUserPassword(), false, false, true);
             saveUser(adminUser);
         }
     }
@@ -47,8 +44,20 @@ public enum DefaultUserRepository implements UserRepository, Initializable, Clos
 
     @Override
     public void saveUser(User user) throws IOException {
-        users.put(user.username(), user);
+        users.put(user.getUsername(), user);
         databaseClient.writeAheadLog(objectMapper.writeValueAsBytes(user));
+    }
+
+    @Override
+    public List<User> findAllUsers() {
+        return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public void saveAllUsers(List<User> users) {
+        for (User user : users) {
+            this.users.put(user.getUsername(), user);
+        }
     }
 
     @Override

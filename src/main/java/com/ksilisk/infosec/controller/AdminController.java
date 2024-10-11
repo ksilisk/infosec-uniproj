@@ -1,24 +1,34 @@
 package com.ksilisk.infosec.controller;
 
-import com.ksilisk.infosec.config.ApplicationProperties;
 import com.ksilisk.infosec.context.ApplicationContext;
 import com.ksilisk.infosec.context.DefaultApplicationContext;
 import com.ksilisk.infosec.entity.User;
 import com.ksilisk.infosec.factory.ApplicationStageFactory;
 import com.ksilisk.infosec.factory.DefaultApplicationStageFactory;
+import com.ksilisk.infosec.repository.DefaultUserRepository;
+import com.ksilisk.infosec.repository.UserRepository;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.util.converter.BooleanStringConverter;
+import javafx.util.converter.DefaultStringConverter;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import static javafx.scene.control.cell.TextFieldTableCell.forTableColumn;
+
 public class AdminController implements Initializable {
+    @FXML
+    private TableView<User> userView;
+
     @FXML
     private TableColumn<User, String> usernameColumn;
     @FXML
@@ -26,29 +36,40 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<User, Boolean> isBlockedColumn;
     @FXML
-    private TableColumn<User, String> passwordRestrictionColumn;
+    private TableColumn<User, Boolean> hasPasswordRestrictionColumn;
     @FXML
     private TableColumn<User, Boolean> isAdminColumn;
-
-    @FXML
-    private Button addUserButton;
-    @FXML
-    private Button changePasswordButton;
-    @FXML
-    private Button exitButton;
 
     @FXML
     private Label adminHelloLabel;
 
     private ApplicationContext applicationContext;
-    private ApplicationProperties applicationProperties;
     private ApplicationStageFactory applicationStageFactory;
+    private UserRepository userRepository;
 
-    public void addUser(MouseEvent event) {
-        // todo implement this
+    public void addUser() {
+        userView.getItems().add(new User());
     }
 
-    public void changePassword(MouseEvent event) {
+    public void save() {
+        List<String> distinctUsernames = userView.getItems()
+                .stream()
+                .map(User::getUsername)
+                .distinct()
+                .toList();
+        if (distinctUsernames.size() != userView.getItems().size()) {
+            new Alert(Alert.AlertType.ERROR, "All usernames should be unique. Try again!").show();
+            return;
+        }
+
+        if (distinctUsernames.contains(null) || distinctUsernames.contains("")) {
+            new Alert(Alert.AlertType.ERROR, "User username can't be empty. Try Again!").show();
+            return;
+        }
+        userRepository.saveAllUsers(new ArrayList<>(userView.getItems()));
+    }
+
+    public void changePassword() {
         try {
             applicationStageFactory.createChangePasswordStage().show();
             ((Stage) (adminHelloLabel.getScene().getWindow())).close();
@@ -58,7 +79,7 @@ public class AdminController implements Initializable {
         }
     }
 
-    public void exit(MouseEvent event) {
+    public void exit() {
         try {
             applicationContext.clear();
             applicationStageFactory.createLoginStage().show();
@@ -73,8 +94,55 @@ public class AdminController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         applicationContext = DefaultApplicationContext.INSTANCE;
-        applicationProperties = ApplicationProperties.INSTANCE;
         applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
-        adminHelloLabel.setText("Hello, %s!".formatted(applicationContext.getCurrentUser().username()));
+        userRepository = DefaultUserRepository.INSTANCE;
+        adminHelloLabel.setText("Hello, %s!".formatted(applicationContext.getCurrentUser().getUsername()));
+        initUserTableView();
+    }
+
+    private void initUserTableView() {
+        // init table columns cell factories
+        isAdminColumn.setCellFactory(forTableColumn(new BooleanStringConverter()));
+        hasPasswordRestrictionColumn.setCellFactory(forTableColumn(new BooleanStringConverter()));
+        isBlockedColumn.setCellFactory(forTableColumn(new BooleanStringConverter()));
+        usernameColumn.setCellFactory(forTableColumn(new DefaultStringConverter()));
+        passwordColumn.setCellFactory(forTableColumn(new DefaultStringConverter()));
+
+        // init edit commit actions
+        isBlockedColumn.setOnEditCommit(e ->
+                e.getTableView()
+                        .getItems()
+                        .get(e.getTablePosition().getRow())
+                        .setIsBlocked(e.getNewValue()));
+        isAdminColumn.setOnEditCommit(e ->
+                e.getTableView()
+                        .getItems()
+                        .get(e.getTablePosition().getRow())
+                        .setIsAdmin(e.getNewValue()));
+        hasPasswordRestrictionColumn.setOnEditCommit(e ->
+                e.getTableView()
+                        .getItems()
+                        .get(e.getTablePosition().getRow())
+                        .setHasPasswordRestriction(e.getNewValue()));
+        usernameColumn.setOnEditCommit(e ->
+                e.getTableView()
+                        .getItems()
+                        .get(e.getTablePosition().getRow())
+                        .setUsername(e.getNewValue()));
+        passwordColumn.setOnEditCommit(e ->
+                e.getTableView()
+                        .getItems()
+                        .get(e.getTablePosition().getRow())
+                        .setUsername(e.getNewValue()));
+
+        // init table cell value factories
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
+        isBlockedColumn.setCellValueFactory(new PropertyValueFactory<>("isBlocked"));
+        isAdminColumn.setCellValueFactory(new PropertyValueFactory<>("isAdmin"));
+        hasPasswordRestrictionColumn.setCellValueFactory(new PropertyValueFactory<>("hasPasswordRestriction"));
+
+        // upload all users
+        userView.getItems().addAll(userRepository.findAllUsers());
     }
 }

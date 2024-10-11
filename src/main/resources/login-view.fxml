@@ -9,7 +9,9 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.ksilisk.infosec.controller.LoginController">
     <top>
         <MenuBar>
-            <Menu text="InfoSec"/>
+            <Menu text="Help">
+                <MenuItem text="About"/>
+            </Menu>
         </MenuBar>
     </top>
     <center>

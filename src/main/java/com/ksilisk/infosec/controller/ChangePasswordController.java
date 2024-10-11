@@ -7,13 +7,14 @@ import com.ksilisk.infosec.factory.ApplicationStageFactory;
 import com.ksilisk.infosec.factory.DefaultApplicationStageFactory;
 import com.ksilisk.infosec.repository.DefaultUserRepository;
 import com.ksilisk.infosec.repository.UserRepository;
+import com.ksilisk.infosec.validate.DefaultPasswordRestrictionValidator;
+import com.ksilisk.infosec.validate.PasswordRestrictionValidator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -26,8 +27,6 @@ public class ChangePasswordController implements Initializable {
 
     @FXML
     private Button changePasswordButton;
-    @FXML
-    private Button backButton;
 
     @FXML
     private PasswordField currentPasswordField;
@@ -37,18 +36,23 @@ public class ChangePasswordController implements Initializable {
     private ApplicationContext applicationContext;
     private UserRepository userRepository;
     private ApplicationStageFactory applicationStageFactory;
+    private PasswordRestrictionValidator passwordRestrictionValidator;
 
-    public void changePassword(MouseEvent event) {
+    public void changePassword() {
         try {
             String currentPass = currentPasswordField.getText();
             String newPass = newPasswordField.getText();
             User currentUser = applicationContext.getCurrentUser();
-            if (!currentUser.password().equals(currentPass)) {
+            if (!currentUser.getPassword().equals(currentPass)) {
                 new Alert(Alert.AlertType.ERROR, "Current password is incorrect. Try Again!").show();
                 return;
             }
-            User updatedUser = new User(currentUser.username(), newPass, currentUser.isBlocked(),
-                    currentUser.passwordRestriction(), currentUser.isAdmin());
+            if (currentUser.getHasPasswordRestriction() && !passwordRestrictionValidator.isValidPassword(newPass)) {
+                new Alert(Alert.AlertType.ERROR, "New password not satisfied to restrictions. Try Again!").show();
+                return;
+            }
+            User updatedUser = new User(currentUser.getUsername(), newPass, currentUser.getIsBlocked(),
+                    currentUser.getHasPasswordRestriction(), currentUser.getIsAdmin());
 
             userRepository.saveUser(updatedUser);
             applicationContext.clear();
@@ -62,9 +66,9 @@ public class ChangePasswordController implements Initializable {
     }
 
 
-    public void back(MouseEvent event) {
+    public void back() {
         try {
-            if (applicationContext.getCurrentUser().isAdmin()) {
+            if (applicationContext.getCurrentUser().getIsAdmin()) {
                 applicationStageFactory.createAdminStage().show();
             } else {
                 applicationStageFactory.createLoginStage().show();
@@ -81,6 +85,7 @@ public class ChangePasswordController implements Initializable {
         applicationContext = DefaultApplicationContext.INSTANCE;
         userRepository = DefaultUserRepository.INSTANCE;
         applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
-        userHelloLabel.setText("%s, here you can change your password.".formatted(applicationContext.getCurrentUser().username()));
+        passwordRestrictionValidator = DefaultPasswordRestrictionValidator.INSTANCE;
+        userHelloLabel.setText("%s, here you can change your password.".formatted(applicationContext.getCurrentUser().getUsername()));
     }
 }

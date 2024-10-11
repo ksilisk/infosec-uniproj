@@ -14,12 +14,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoginController implements Initializable {
     @FXML
@@ -33,7 +33,9 @@ public class LoginController implements Initializable {
     private ApplicationStageFactory applicationStageFactory;
     private ApplicationContext applicationContext;
 
-    public void login(MouseEvent event) {
+    private final AtomicInteger attempts = new AtomicInteger();
+
+    public void login() {
         try {
             String username = loginField.getText();
             String password = passwordField.getText();
@@ -44,18 +46,21 @@ public class LoginController implements Initializable {
             }
 
             User user = maybeUser.get();
-            if (!user.password().equals(password)) {
+            if (!user.getPassword().equals(password)) {
+                if (attempts.incrementAndGet() >= 4) {
+                    exit();
+                }
                 new Alert(Alert.AlertType.ERROR, "Incorrect Password").show();
                 return;
             }
 
-            if (user.isBlocked()) {
+            if (user.getIsBlocked()) {
                 new Alert(Alert.AlertType.ERROR, "You are blocked in system. Contact to admin please.").show();
                 return;
             }
 
             applicationContext.setCurrentUser(user);
-            if (user.isAdmin()) {
+            if (user.getIsAdmin()) {
                 applicationStageFactory.createAdminStage().show();
             } else {
                 applicationStageFactory.createChangePasswordStage().show();
@@ -67,7 +72,7 @@ public class LoginController implements Initializable {
         }
     }
 
-    public void exit(MouseEvent event) {
+    public void exit() {
         Platform.exit();
     }
 

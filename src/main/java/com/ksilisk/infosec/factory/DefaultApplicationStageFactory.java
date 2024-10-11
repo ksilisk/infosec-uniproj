@@ -18,9 +18,10 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
     public Stage createLoginStage() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(applicationProperties.getLoginViewFile().toURI().toURL());
         Stage stage = new Stage();
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("InfoSec App!");
         stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
         return stage;
     }
 
@@ -29,7 +30,7 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
         FXMLLoader adminLoader = new FXMLLoader(applicationProperties.getAdminViewFile().toURI().toURL());
         Parent parent = adminLoader.load();
         Stage stage = new Stage();
-        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(parent));
         return stage;
     }
@@ -39,7 +40,7 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
         FXMLLoader adminLoader = new FXMLLoader(applicationProperties.getChangePasswordViewFile().toURI().toURL());
         Parent parent = adminLoader.load();
         Stage stage = new Stage();
-        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(parent));
         return stage;
     }
