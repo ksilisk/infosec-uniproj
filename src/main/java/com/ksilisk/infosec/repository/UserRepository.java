@@ -13,5 +13,7 @@ public interface UserRepository {
 
     List<User> findAllUsers();
 
-    void saveAllUsers(List<User> users);
+    void saveAllUsers(List<User> users) throws IOException;
+
+    void load() throws Exception;
 }

@@ -10,4 +10,6 @@ public interface ApplicationStageFactory {
     Stage createAdminStage() throws IOException;
 
     Stage createChangePasswordStage() throws IOException;
+
+    Stage createDBPasswordStage() throws IOException;
 }

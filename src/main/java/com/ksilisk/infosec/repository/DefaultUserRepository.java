@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ksilisk.infosec.config.ApplicationProperties;
 import com.ksilisk.infosec.database.DatabaseClient;
 import com.ksilisk.infosec.entity.User;
-import com.ksilisk.infosec.initialize.Initializable;
+import com.ksilisk.infosec.initialization.Initializable;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -23,18 +23,7 @@ public enum DefaultUserRepository implements UserRepository, Initializable, Clos
 
     @Override
     public void initialize() throws IOException {
-        byte[] databaseData = databaseClient.load();
-        if (databaseData.length > 0) {
-            List<User> userList = objectMapper.readValue(databaseClient.load(), new TypeReference<>() {
-            });
-            this.users.putAll(userList.stream().collect(Collectors.toMap(User::getUsername, Function.identity())));
-        }
-
-        if (!users.containsKey(appProperties.getApplicationAdminUserLogin())) {
-            User adminUser = new User(appProperties.getApplicationAdminUserLogin(),
-                    appProperties.getApplicationAdminUserPassword(), false, false, true);
-            saveUser(adminUser);
-        }
+        // maybe add initialize
     }
 
     @Override
@@ -54,15 +43,37 @@ public enum DefaultUserRepository implements UserRepository, Initializable, Clos
     }
 
     @Override
-    public void saveAllUsers(List<User> users) {
+    public void saveAllUsers(List<User> users) throws IOException {
         for (User user : users) {
-            this.users.put(user.getUsername(), user);
+            saveUser(user);
+        }
+    }
+
+    @Override
+    public void load() throws Exception {
+        byte[] databaseData = databaseClient.load();
+        if (databaseData.length > 0) {
+            List<User> userList = objectMapper.readValue(databaseData, new TypeReference<>() {
+            });
+            this.users.putAll(userList.stream().collect(Collectors.toMap(User::getUsername, Function.identity())));
+        }
+        if (!users.containsKey(appProperties.getApplicationAdminUserLogin())) {
+            User adminUser = new User(appProperties.getApplicationAdminUserLogin(),
+                    appProperties.getApplicationAdminUserPassword(), false, false, true);
+            saveUser(adminUser);
         }
     }
 
     @Override
     public void close() throws IOException {
-        List<User> userList = users.values().stream().toList();
-        databaseClient.save(objectMapper.writeValueAsBytes(userList));
+        try {
+            List<User> userList = users.values().stream().toList();
+            databaseClient.save(objectMapper.writeValueAsBytes(userList));
+        } catch (IOException ioException) {
+            throw ioException;
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            throw new IllegalStateException(ex);
+        }
     }
 }

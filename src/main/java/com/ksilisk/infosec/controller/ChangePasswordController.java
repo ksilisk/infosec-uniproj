@@ -2,6 +2,7 @@ package com.ksilisk.infosec.controller;
 
 import com.ksilisk.infosec.context.ApplicationContext;
 import com.ksilisk.infosec.context.DefaultApplicationContext;
+import com.ksilisk.infosec.customizer.MenuBarCustomizer;
 import com.ksilisk.infosec.entity.User;
 import com.ksilisk.infosec.factory.ApplicationStageFactory;
 import com.ksilisk.infosec.factory.DefaultApplicationStageFactory;
@@ -11,10 +12,7 @@ import com.ksilisk.infosec.validate.DefaultPasswordRestrictionValidator;
 import com.ksilisk.infosec.validate.PasswordRestrictionValidator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,6 +20,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ChangePasswordController implements Initializable {
+    @FXML
+    private MenuBar menuBar;
+
     @FXML
     private Label userHelloLabel;
 
@@ -58,7 +59,7 @@ public class ChangePasswordController implements Initializable {
             applicationContext.clear();
             ((Stage) (changePasswordButton.getScene().getWindow())).close();
             applicationStageFactory.createLoginStage().show();
-            new Alert(Alert.AlertType.CONFIRMATION, "Password successfully updated!").show();
+            new Alert(Alert.AlertType.INFORMATION, "Password successfully updated!").show();
         } catch (IOException ex) {
             ex.printStackTrace(System.err);
             new Alert(Alert.AlertType.ERROR, "Internal Application Error.").show();
@@ -86,6 +87,7 @@ public class ChangePasswordController implements Initializable {
         userRepository = DefaultUserRepository.INSTANCE;
         applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
         passwordRestrictionValidator = DefaultPasswordRestrictionValidator.INSTANCE;
+        MenuBarCustomizer.INSTANCE.customize(menuBar);
         userHelloLabel.setText("%s, here you can change your password.".formatted(applicationContext.getCurrentUser().getUsername()));
     }
 }

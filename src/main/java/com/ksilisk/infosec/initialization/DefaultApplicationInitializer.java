@@ -1,9 +1,10 @@
-package com.ksilisk.infosec.initialize;
+package com.ksilisk.infosec.initialization;
 
 import com.ksilisk.infosec.config.ApplicationProperties;
 import com.ksilisk.infosec.context.DefaultApplicationContext;
 import com.ksilisk.infosec.database.DatabaseClient;
 import com.ksilisk.infosec.repository.DefaultUserRepository;
+import com.ksilisk.infosec.security.DefaultCipherCoder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,12 +26,13 @@ public enum DefaultApplicationInitializer implements ApplicationInitializer {
                 ApplicationProperties.INSTANCE,
                 DefaultApplicationContext.INSTANCE,
                 DefaultUserRepository.INSTANCE,
-                DatabaseClient.INSTANCE
+                DatabaseClient.INSTANCE,
+                DefaultCipherCoder.INSTANCE
         ));
     }
 
     @Override
-    public void initialize() throws IOException {
+    public void initialize() throws Exception {
         createDirectoriesIfNeeded();
         initializables.sort(Comparator.comparingInt(Initializable::getOrder));
         for (Initializable initializable : initializables) {

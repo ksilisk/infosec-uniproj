@@ -1,14 +1,14 @@
 package com.ksilisk.infosec.context;
 
 import com.ksilisk.infosec.entity.User;
-import com.ksilisk.infosec.initialize.Initializable;
+import com.ksilisk.infosec.initialization.Initializable;
 
 import java.io.IOException;
 
 public enum DefaultApplicationContext implements ApplicationContext, Initializable {
     INSTANCE;
 
-    private User currentUser;
+    private volatile User currentUser;
 
     @Override
     public void clear() {
@@ -16,12 +16,12 @@ public enum DefaultApplicationContext implements ApplicationContext, Initializab
     }
 
     @Override
-    public synchronized void setCurrentUser(User user) {
+    public void setCurrentUser(User user) {
         this.currentUser = user;
     }
 
     @Override
-    public synchronized User getCurrentUser() {
+    public User getCurrentUser() {
         return currentUser;
     }
 

@@ -3,6 +3,7 @@ package com.ksilisk.infosec.controller;
 import com.ksilisk.infosec.config.ApplicationProperties;
 import com.ksilisk.infosec.context.ApplicationContext;
 import com.ksilisk.infosec.context.DefaultApplicationContext;
+import com.ksilisk.infosec.customizer.MenuBarCustomizer;
 import com.ksilisk.infosec.entity.User;
 import com.ksilisk.infosec.factory.ApplicationStageFactory;
 import com.ksilisk.infosec.factory.DefaultApplicationStageFactory;
@@ -12,6 +13,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -22,6 +24,9 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoginController implements Initializable {
+    @FXML
+    private MenuBar menuBar;
+
     @FXML
     private TextField loginField;
 
@@ -82,6 +87,7 @@ public class LoginController implements Initializable {
         applicationProperties = ApplicationProperties.INSTANCE;
         applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
         applicationContext = DefaultApplicationContext.INSTANCE;
+        MenuBarCustomizer.INSTANCE.customize(menuBar);
         loginField.setText(applicationProperties.getApplicationAdminUserLogin());
     }
 }

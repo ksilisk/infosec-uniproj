@@ -16,11 +16,11 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
 
     @Override
     public Stage createLoginStage() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(applicationProperties.getLoginViewFile().toURI().toURL());
+        FXMLLoader loginStage = new FXMLLoader(applicationProperties.getLoginViewFile().toURI().toURL());
         Stage stage = new Stage();
-        Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("InfoSec App!");
-        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setScene(new Scene(loginStage.load()));
         stage.initModality(Modality.APPLICATION_MODAL);
         return stage;
     }
@@ -30,6 +30,8 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
         FXMLLoader adminLoader = new FXMLLoader(applicationProperties.getAdminViewFile().toURI().toURL());
         Parent parent = adminLoader.load();
         Stage stage = new Stage();
+        stage.setTitle("Admin Menu");
+        stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(parent));
         return stage;
@@ -37,9 +39,23 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
 
     @Override
     public Stage createChangePasswordStage() throws IOException {
-        FXMLLoader adminLoader = new FXMLLoader(applicationProperties.getChangePasswordViewFile().toURI().toURL());
-        Parent parent = adminLoader.load();
+        FXMLLoader changePassword = new FXMLLoader(applicationProperties.getChangePasswordViewFile().toURI().toURL());
+        Parent parent = changePassword.load();
         Stage stage = new Stage();
+        stage.setTitle("Change Password");
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(new Scene(parent));
+        return stage;
+    }
+
+    @Override
+    public Stage createDBPasswordStage() throws IOException {
+        FXMLLoader dbPasswordStage = new FXMLLoader(applicationProperties.getDBPasswordViewFile().toURI().toURL());
+        Parent parent = dbPasswordStage.load();
+        Stage stage = new Stage();
+        stage.setTitle("Database password");
+        stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(new Scene(parent));
         return stage;

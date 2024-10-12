@@ -2,6 +2,7 @@ package com.ksilisk.infosec.controller;
 
 import com.ksilisk.infosec.context.ApplicationContext;
 import com.ksilisk.infosec.context.DefaultApplicationContext;
+import com.ksilisk.infosec.customizer.MenuBarCustomizer;
 import com.ksilisk.infosec.entity.User;
 import com.ksilisk.infosec.factory.ApplicationStageFactory;
 import com.ksilisk.infosec.factory.DefaultApplicationStageFactory;
@@ -9,10 +10,7 @@ import com.ksilisk.infosec.repository.DefaultUserRepository;
 import com.ksilisk.infosec.repository.UserRepository;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.converter.BooleanStringConverter;
@@ -26,6 +24,9 @@ import java.util.ResourceBundle;
 import static javafx.scene.control.cell.TextFieldTableCell.forTableColumn;
 
 public class AdminController implements Initializable {
+    @FXML
+    private MenuBar menuBar;
+
     @FXML
     private TableView<User> userView;
 
@@ -52,21 +53,26 @@ public class AdminController implements Initializable {
     }
 
     public void save() {
-        List<String> distinctUsernames = userView.getItems()
-                .stream()
-                .map(User::getUsername)
-                .distinct()
-                .toList();
-        if (distinctUsernames.size() != userView.getItems().size()) {
-            new Alert(Alert.AlertType.ERROR, "All usernames should be unique. Try again!").show();
-            return;
-        }
+        try {
+            List<String> distinctUsernames = userView.getItems()
+                    .stream()
+                    .map(User::getUsername)
+                    .distinct()
+                    .toList();
+            if (distinctUsernames.size() != userView.getItems().size()) {
+                new Alert(Alert.AlertType.ERROR, "All usernames should be unique. Try again!").show();
+                return;
+            }
 
-        if (distinctUsernames.contains(null) || distinctUsernames.contains("")) {
-            new Alert(Alert.AlertType.ERROR, "User username can't be empty. Try Again!").show();
-            return;
+            if (distinctUsernames.contains(null) || distinctUsernames.contains("")) {
+                new Alert(Alert.AlertType.ERROR, "User username can't be empty. Try Again!").show();
+                return;
+            }
+            userRepository.saveAllUsers(new ArrayList<>(userView.getItems()));
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            new Alert(Alert.AlertType.ERROR, "Internal Application Error.").show();
         }
-        userRepository.saveAllUsers(new ArrayList<>(userView.getItems()));
     }
 
     public void changePassword() {
@@ -97,6 +103,7 @@ public class AdminController implements Initializable {
         applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
         userRepository = DefaultUserRepository.INSTANCE;
         adminHelloLabel.setText("Hello, %s!".formatted(applicationContext.getCurrentUser().getUsername()));
+        MenuBarCustomizer.INSTANCE.customize(menuBar);
         initUserTableView();
     }
 
@@ -133,7 +140,7 @@ public class AdminController implements Initializable {
                 e.getTableView()
                         .getItems()
                         .get(e.getTablePosition().getRow())
-                        .setUsername(e.getNewValue()));
+                        .setPassword(e.getNewValue()));
 
         // init table cell value factories
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));

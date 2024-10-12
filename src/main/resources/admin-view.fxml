@@ -8,16 +8,12 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.ksilisk.infosec.controller.AdminController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefHeight="500.0" prefWidth="700.0">
     <top>
-        <MenuBar>
-            <Menu text="Help">
-                <MenuItem text="About"/>
-            </Menu>
-        </MenuBar>
+        <MenuBar fx:id="menuBar"/>
     </top>
     <center>
-        <VBox>
+        <VBox spacing="20">
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
