@@ -25,7 +25,6 @@
                 </columnResizePolicy>
                 <columns>
                     <TableColumn fx:id="usernameColumn" sortable="false" text="Username"/>
-                    <TableColumn fx:id="passwordColumn" sortable="false" text="Password"/>
                     <TableColumn fx:id="isBlockedColumn" sortable="false" text="Blocked"/>
                     <TableColumn fx:id="hasPasswordRestrictionColumn" sortable="false" text="Password Restriction"/>
                     <TableColumn fx:id="isAdminColumn" sortable="false" text="Admin"/>

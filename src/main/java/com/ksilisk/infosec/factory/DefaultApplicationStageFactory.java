@@ -60,4 +60,16 @@ public enum DefaultApplicationStageFactory implements ApplicationStageFactory {
         stage.setScene(new Scene(parent));
         return stage;
     }
+
+    @Override
+    public Stage createUserStage() throws IOException {
+        FXMLLoader userView = new FXMLLoader(applicationProperties.getUserViewFile().toURI().toURL());
+        Parent parent = userView.load();
+        Stage stage = new Stage();
+        stage.setTitle("User Menu");
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(new Scene(parent));
+        return stage;
+    }
 }

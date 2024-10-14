@@ -1,6 +1,5 @@
 package com.ksilisk.infosec.controller;
 
-import com.ksilisk.infosec.config.ApplicationProperties;
 import com.ksilisk.infosec.context.ApplicationContext;
 import com.ksilisk.infosec.context.DefaultApplicationContext;
 import com.ksilisk.infosec.customizer.MenuBarCustomizer;
@@ -34,7 +33,6 @@ public class LoginController implements Initializable {
     private PasswordField passwordField;
 
     private UserRepository userRepository;
-    private ApplicationProperties applicationProperties;
     private ApplicationStageFactory applicationStageFactory;
     private ApplicationContext applicationContext;
 
@@ -68,7 +66,7 @@ public class LoginController implements Initializable {
             if (user.getIsAdmin()) {
                 applicationStageFactory.createAdminStage().show();
             } else {
-                applicationStageFactory.createChangePasswordStage().show();
+                applicationStageFactory.createUserStage().show();
             }
             ((Stage) (loginField.getScene().getWindow())).close();
         } catch (Exception ex) {
@@ -84,10 +82,8 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userRepository = DefaultUserRepository.INSTANCE;
-        applicationProperties = ApplicationProperties.INSTANCE;
         applicationStageFactory = DefaultApplicationStageFactory.INSTANCE;
         applicationContext = DefaultApplicationContext.INSTANCE;
         MenuBarCustomizer.INSTANCE.customize(menuBar);
-        loginField.setText(applicationProperties.getApplicationAdminUserLogin());
     }
 }

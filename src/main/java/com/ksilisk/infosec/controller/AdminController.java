@@ -33,8 +33,6 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<User, String> usernameColumn;
     @FXML
-    private TableColumn<User, String> passwordColumn;
-    @FXML
     private TableColumn<User, Boolean> isBlockedColumn;
     @FXML
     private TableColumn<User, Boolean> hasPasswordRestrictionColumn;
@@ -113,7 +111,6 @@ public class AdminController implements Initializable {
         hasPasswordRestrictionColumn.setCellFactory(forTableColumn(new BooleanStringConverter()));
         isBlockedColumn.setCellFactory(forTableColumn(new BooleanStringConverter()));
         usernameColumn.setCellFactory(forTableColumn(new DefaultStringConverter()));
-        passwordColumn.setCellFactory(forTableColumn(new DefaultStringConverter()));
 
         // init edit commit actions
         isBlockedColumn.setOnEditCommit(e ->
@@ -136,15 +133,9 @@ public class AdminController implements Initializable {
                         .getItems()
                         .get(e.getTablePosition().getRow())
                         .setUsername(e.getNewValue()));
-        passwordColumn.setOnEditCommit(e ->
-                e.getTableView()
-                        .getItems()
-                        .get(e.getTablePosition().getRow())
-                        .setPassword(e.getNewValue()));
 
         // init table cell value factories
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
         isBlockedColumn.setCellValueFactory(new PropertyValueFactory<>("isBlocked"));
         isAdminColumn.setCellValueFactory(new PropertyValueFactory<>("isAdmin"));
         hasPasswordRestrictionColumn.setCellValueFactory(new PropertyValueFactory<>("hasPasswordRestriction"));

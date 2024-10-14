@@ -33,6 +33,8 @@ public class ChangePasswordController implements Initializable {
     private PasswordField currentPasswordField;
     @FXML
     private PasswordField newPasswordField;
+    @FXML
+    private PasswordField newPasswordAgainField;
 
     private ApplicationContext applicationContext;
     private UserRepository userRepository;
@@ -43,9 +45,14 @@ public class ChangePasswordController implements Initializable {
         try {
             String currentPass = currentPasswordField.getText();
             String newPass = newPasswordField.getText();
+            String newPassAgain = newPasswordAgainField.getText();
             User currentUser = applicationContext.getCurrentUser();
             if (!currentUser.getPassword().equals(currentPass)) {
                 new Alert(Alert.AlertType.ERROR, "Current password is incorrect. Try Again!").show();
+                return;
+            }
+            if (!newPassAgain.equals(newPass)) {
+                new Alert(Alert.AlertType.ERROR, "New password and new password again not equal. Try again!").show();
                 return;
             }
             if (currentUser.getHasPasswordRestriction() && !passwordRestrictionValidator.isValidPassword(newPass)) {
@@ -72,7 +79,7 @@ public class ChangePasswordController implements Initializable {
             if (applicationContext.getCurrentUser().getIsAdmin()) {
                 applicationStageFactory.createAdminStage().show();
             } else {
-                applicationStageFactory.createLoginStage().show();
+                applicationStageFactory.createUserStage().show();
             }
             ((Stage) (changePasswordButton.getScene().getWindow())).close();
         } catch (Exception ex) {
